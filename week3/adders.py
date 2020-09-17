@@ -75,7 +75,16 @@ Implement a 2-bit half adder below. You may only use NAND
 """
 
 def HADD2(a0, a1, b0, b1):
-    return 0,0
+    a_b = NAND(str(a1), str(b1))
+
+    not_a = NAND(str(a1), str(a1))
+    not_b = NAND(str(b1), str(b1))
+
+    nota_notb = NAND(not_a, not_b)
+
+    flipped_result = NAND(a_b, nota_notb)
+
+    return 0,int(NAND(flipped_result, flipped_result))
 
 assert(HADD2(1,0,1,0) == (0,0))
 assert(HADD2(1,1,1,0) == (0,1))
@@ -87,17 +96,59 @@ assert(HADD2(1,1,0,1) == (0,0))
 Implement a Full Adder below. You may use only NAND."""
 
 def FADD(a,b,c):
-    return 0,0
+    not_a = NAND(str(a), str(a))
+    not_b = NAND(str(b), str(b))
+    not_c = NAND(str(c), str(c))
+    
+    # perform a + b
+    a_b = NAND(str(a), str(b))
+    nota_notb = NAND(not_a, not_b)
+    not_a_plus_b = NAND(a_b, nota_notb)
+    a_plus_b = NAND(not_a_plus_b, not_a_plus_b)
+
+    # perform (a+b) + c
+    ab_c = NAND(a_plus_b, str(c))
+    notab_notc = NAND(not_a_plus_b, not_c)
+    not_ab_plus_c = NAND(ab_c, notab_notc)
+    ab_plus_c = NAND(not_ab_plus_c, not_ab_plus_c)
+
+    # we want to activate the carry bit if the majority of a, b, c are 1
+    b_c = NAND(str(b), str(c))
+    a_c = NAND(str(a), str(c))
+   
+    and_a_b = NAND(a_b, a_b)
+    and_b_c = NAND(b_c, b_c)
+    and_a_c = NAND(a_c, a_c)
+
+    not_and_a_b = NAND(and_a_b, and_a_b)
+    not_and_b_c = NAND(and_b_c, and_b_c)
+    not_and_a_c = NAND(and_a_c, and_a_c)
+
+    or1 = NAND(not_and_a_b, not_and_a_c)
+    not_or1 = NAND(or1, or1)
+
+    carry = NAND(not_or1, not_and_b_c)
+
+    return int(carry), int(ab_plus_c)
     
 assert(FADD(0,1,1) == (1,0))
 assert(FADD(0,0,0) == (0,0))
+assert(FADD(0,1,0) == (0,1))
 assert(FADD(1,1,1) == (1,1))
 
 """Use the HADD2 and FADD procedures to implement a function that adds together two 4-bit numbers. You may use NAND, XOR, MAJ, or any other procedures as syntactic sugar if you wish (you must follow these same rules when implementing your own procedures)."""
 
 def ADD4(a0, a1, a2, a3, b0, b1, b2, b3):
-    return 0 # you must figure out how many bits you actually need to return
+    carry3, least_sig = FADD(a3, b3, 0)
+    carry2, second_least_sig = FADD(a2, b2, carry3)
+    carry1, second_most_sig = FADD(a1, b1, carry2)
+    _, most_sig = FADD(a0, b0, carry1)
+
+    return most_sig, second_most_sig, second_least_sig, least_sig
     
+assert(ADD4(0,0,0,0,1,1,1,1) == (1,1,1,1))
+assert(ADD4(1,1,1,1,1,1,1,1) == (1,1,1,0))
+assert(ADD4(1,0,1,0,0,1,0,1) == (1,1,1,1))
 """The next problem is a challenge problem. These are problems whose difficulty is so high that we do not necessarily expect most students will be able to do them within the time constraints of this assignment. We do, though, believe that they will be good practice. You are not required to complete or even attempt any challenge problems, but if you do, please let you Cohort Coach know. Successful completion of challenge problems will very much impress the course staff, and can also improve your community score.
 
 CHALLENGE: Implement a function which computes the product of two 4-bit numbers"""
