@@ -137,18 +137,26 @@ assert(FADD(0,1,0) == (0,1))
 assert(FADD(1,1,1) == (1,1))
 
 """Use the HADD2 and FADD procedures to implement a function that adds together two 4-bit numbers. You may use NAND, XOR, MAJ, or any other procedures as syntactic sugar if you wish (you must follow these same rules when implementing your own procedures)."""
+# returns the value of a if cond is true
+def IF(cond, a, b):
+    not_cond = NAND(cond, cond)
+    temp1 = NAND(b, not_cond)
+    temp2 = NAND(a, cond)
+    return NAND(temp1, temp2)
+
 
 def ADD4(a0, a1, a2, a3, b0, b1, b2, b3):
+    # compute each digit
     carry3, least_sig = FADD(a3, b3, 0)
     carry2, second_least_sig = FADD(a2, b2, carry3)
     carry1, second_most_sig = FADD(a1, b1, carry2)
-    _, most_sig = FADD(a0, b0, carry1)
+    carry0, most_sig = FADD(a0, b0, carry1)
 
-    return most_sig, second_most_sig, second_least_sig, least_sig
+    return carry0, most_sig, second_most_sig, second_least_sig, least_sig
     
-assert(ADD4(0,0,0,0,1,1,1,1) == (1,1,1,1))
-assert(ADD4(1,1,1,1,1,1,1,1) == (1,1,1,0))
-assert(ADD4(1,0,1,0,0,1,0,1) == (1,1,1,1))
+assert(ADD4(0,0,0,0,1,1,1,1) == (0, 1,1,1,1))
+assert(ADD4(1,1,1,1,1,1,1,1) == (1, 1,1,1,0))
+assert(ADD4(1,0,1,0,0,1,0,1) == (0, 1,1,1,1))
 """The next problem is a challenge problem. These are problems whose difficulty is so high that we do not necessarily expect most students will be able to do them within the time constraints of this assignment. We do, though, believe that they will be good practice. You are not required to complete or even attempt any challenge problems, but if you do, please let you Cohort Coach know. Successful completion of challenge problems will very much impress the course staff, and can also improve your community score.
 
 CHALLENGE: Implement a function which computes the product of two 4-bit numbers"""
