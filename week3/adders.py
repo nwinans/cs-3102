@@ -120,9 +120,19 @@ assert(FADD('0','1','0') == ('0','1'))
 assert(FADD('1','1','1') == ('1','1'))
 
 """Use the HADD2 and FADD procedures to implement a function that adds together two 4-bit numbers. You may use NAND, XOR, MAJ, or any other procedures as syntactic sugar if you wish (you must follow these same rules when implementing your own procedures)."""
+def HADD1(a, b):
+    a_b = NAND(a, b)
+    nand_a_b = NAND(a, a_b)
+    nand_b_a = NAND(b, a_b)
+    s = NAND(nand_a_b, nand_b_a)
+    c = NAND(a_b, a_b)
+    return c, s
+
+
 def ADD4(a0, a1, a2, a3, b0, b1, b2, b3):
     # compute each digit
-    carry3, least_sig = FADD(a3, b3, '0')
+    #carry3, least_sig = FADD(a3, b3, '0')
+    carry3, least_sig = HADD1(a3, b3)
     carry2, second_least_sig = FADD(a2, b2, carry3)
     carry1, second_most_sig = FADD(a1, b1, carry2)
     carry0, most_sig = FADD(a0, b0, carry1)
