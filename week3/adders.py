@@ -136,7 +136,33 @@ assert(ADD4('1','0','1','0','0','1','0','1') == ('0','1','1','1','1'))
 
 CHALLENGE: Implement a function which computes the product of two 4-bit numbers"""
 
+def MULT41(a0, a1, a2, a3, b0):
+    a_inv = NAND(a0, b0)
+    b_inv = NAND(a1, b0)
+    c_inv = NAND(a2, b0)
+    d_inv = NAND(a3, b0)
+
+    a = NAND(a_inv, a_inv)
+    b = NAND(b_inv, b_inv)
+    c = NAND(c_inv, c_inv)
+    d = NAND(d_inv, d_inv)
+
+    return a, b, c, d
+
+
 def MULT4(a0, a1, a2, a3, b0, b1, b2, b3):
-    return 0 # you must figure out how many bits you actually need to return
+    fourth_0, fourth_1, fourth_2, fourth_3 = MULT41(a0, a1, a2, a3, b3)
+    third_0, third_1, third_2, third_3 = MULT41(a0, a1, a2, a3, b2)
+    second_0, second_1, second_2, second_3 = MULT41(a0, a1, a2, a3, b1)
+    first_0, first_1, first_2, first_3 = MULT41(a0, a1, a2, a3, b0)
 
+    stage_2_0, stage_2_1, stage_2_2, stage_2_3, stage_2_4 = ADD4("0", fourth_0, fourth_1, fourth_2, third_0, third_1, third_2, third_3)
+    stage_3_0, stage_3_1, stage_3_2, stage_3_3, stage_3_4 = ADD4(stage_2_0, stage_2_1, stage_2_2, stage_2_3, second_0, second_1, second_2, second_3)
+    stage_4_0, stage_4_1, stage_4_2, stage_4_3, stage_4_4 = ADD4(stage_3_0, stage_3_1, stage_3_2, stage_3_3, first_0, first_1, first_2, first_3)
 
+    return stage_4_0, stage_4_1, stage_4_2, stage_4_3, stage_4_4, stage_3_4, stage_2_4, fourth_3
+
+assert(MULT4('1','1','1','1','1','1','0','0') == ('1','0','1','1','0','1','0','0'))
+assert(MULT4('1','0','1','0','1','0','1','1') == ('0','1','1','0','1','1','1','0'))
+assert(MULT4('0','0','0','0','1','1','1','1') == ('0','0','0','0','0','0','0','0'))
+assert(MULT4('1','1','1','1','1','1','1','1') == ('1','1','1','0','0','0','0','1'))
