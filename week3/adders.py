@@ -136,6 +136,12 @@ assert(ADD4('1','0','1','0','0','1','0','1') == ('0','1','1','1','1'))
 
 CHALLENGE: Implement a function which computes the product of two 4-bit numbers"""
 
+# Looking at binary mulitiplication, at the 1x1 level, it is essentially ANDing bits together since
+# the result of two numbers multiplied in binary is only 1 when the two bits are 1. Thus, to perform
+# grade school multiplication where we multiply one digit on the bottom row by the whole top row, save
+# places and add, we can just create a new function to multiply a 4 digit number by a 1 digit number
+# where we just AND all the values. 
+
 def MULT41(a0, a1, a2, a3, b0):
     a_inv = NAND(a0, b0)
     b_inv = NAND(a1, b0)
@@ -151,18 +157,24 @@ def MULT41(a0, a1, a2, a3, b0):
 
 
 def MULT4(a0, a1, a2, a3, b0, b1, b2, b3):
+    # then to actually multiply a 4 digit number by another, we need to multiply each bit in b by all
+    # the bits in a
     fourth_0, fourth_1, fourth_2, fourth_3 = MULT41(a0, a1, a2, a3, b3)
     third_0, third_1, third_2, third_3 = MULT41(a0, a1, a2, a3, b2)
     second_0, second_1, second_2, second_3 = MULT41(a0, a1, a2, a3, b1)
     first_0, first_1, first_2, first_3 = MULT41(a0, a1, a2, a3, b0)
 
+    # then we need to add the bits together, saving the place of each corresponding partial product
     stage_2_0, stage_2_1, stage_2_2, stage_2_3, stage_2_4 = ADD4("0", fourth_0, fourth_1, fourth_2, third_0, third_1, third_2, third_3)
     stage_3_0, stage_3_1, stage_3_2, stage_3_3, stage_3_4 = ADD4(stage_2_0, stage_2_1, stage_2_2, stage_2_3, second_0, second_1, second_2, second_3)
     stage_4_0, stage_4_1, stage_4_2, stage_4_3, stage_4_4 = ADD4(stage_3_0, stage_3_1, stage_3_2, stage_3_3, first_0, first_1, first_2, first_3)
 
+    # notice how in the result, the very last term is actually just from the product stage since no
+    # other partial product can have that small of a significant value (only 1x1 can fill the 1's 
+    # place in binary)
     return stage_4_0, stage_4_1, stage_4_2, stage_4_3, stage_4_4, stage_3_4, stage_2_4, fourth_3
 
-assert(MULT4('1','1','1','1','1','1','0','0') == ('1','0','1','1','0','1','0','0'))
-assert(MULT4('1','0','1','0','1','0','1','1') == ('0','1','1','0','1','1','1','0'))
-assert(MULT4('0','0','0','0','1','1','1','1') == ('0','0','0','0','0','0','0','0'))
-assert(MULT4('1','1','1','1','1','1','1','1') == ('1','1','1','0','0','0','0','1'))
+assert(MULT4('1','1','1','1','1','1','0','0') == ('1','0','1','1','0','1','0','0')) # 15x12=180
+assert(MULT4('1','0','1','0','1','0','1','1') == ('0','1','1','0','1','1','1','0')) # 10x11=110
+assert(MULT4('0','0','0','0','1','1','1','1') == ('0','0','0','0','0','0','0','0')) # 15x0=0
+assert(MULT4('1','1','1','1','1','1','1','1') == ('1','1','1','0','0','0','0','1')) #15x15=225
