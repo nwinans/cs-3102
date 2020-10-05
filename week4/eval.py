@@ -17,7 +17,7 @@ def list_strings(n):
 """ This function converts a given natural number into a bit string, where the length of the bit string is fixed to be the second argument."""
 def nat_to_string(number, num_bits):
     binary = ""
-    for i in range(num_bits):
+    for _ in range(num_bits):
         bit = str(number % 2)
         number = number // 2
         binary = bit + binary
